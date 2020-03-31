@@ -9,12 +9,17 @@
 import Foundation
 import UIKit
 
+protocol NewsFeedCodeCellDelegate: class {
+    func revealText(cell: NewsFeedCodeCell)
+}
+
 final class NewsFeedCodeCell: UITableViewCell {
+    
+    weak var delegate: NewsFeedCodeCellDelegate?
     
     static let reuseId = "NewsFeedCodeCell"
     
     // 1st layer
-    
     let cardView: UIView = {
        let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -35,6 +40,16 @@ final class NewsFeedCodeCell: UITableViewCell {
         label.font = UIFont.systemFont(ofSize: 15)
          label.textColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
         return label
+    }()
+    
+    let moreTextButton: UIButton = {
+       let button = UIButton()
+         button.titleLabel?.font = UIFont.systemFont(ofSize: 15)
+        button.setTitleColor(#colorLiteral(red: 0, green: 0.4784313725, blue: 1, alpha: 1), for: .normal)
+        button.contentHorizontalAlignment = .left
+        button.contentVerticalAlignment = .center
+        button.setTitle("Показать полностью...", for: .normal)
+        return button
     }()
     
     let postImageView: WebImageView = {
@@ -175,7 +190,7 @@ final class NewsFeedCodeCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        backgroundColor = #colorLiteral(red: 0.2392156869, green: 0.6745098233, blue: 0.9686274529, alpha: 1)
+        backgroundColor = #colorLiteral(red: 0.1411764771, green: 0.3960784376, blue: 0.5647059083, alpha: 1)
         
         iconImageVIew.layer.cornerRadius = Constants.topViewHeight / 2
         iconImageVIew.clipsToBounds = true
@@ -183,11 +198,17 @@ final class NewsFeedCodeCell: UITableViewCell {
         cardView.layer.cornerRadius = 10
         cardView.clipsToBounds = true
         
+        moreTextButton.addTarget(self, action: #selector(moreTextButtonTapped), for: .touchUpInside)
+        
         firstLayerSetup()
         secondLayerSetup()
         thirdLayerOnTopViewLayout()
         thirdLayerOnBottomViewLayout()
         fourthLayerOnButtomViewViewsLayout()
+    }
+    
+    @objc func moreTextButtonTapped() {
+        delegate?.revealText(cell: self)
     }
     
     func set(viewModel: FeedCellViewModel) {
@@ -199,7 +220,9 @@ final class NewsFeedCodeCell: UITableViewCell {
         commentsCountLabel.text = viewModel.comments
         sharesCountLabel.text = viewModel.shares
         viewsCountLabel.text = viewModel.views
+        
         postImageView.frame = viewModel.sizes.postAttachmentoFrame
+        moreTextButton.frame = viewModel.sizes.moreTextButtonFrame
         postLabel.frame = viewModel.sizes.postLabelFrame
         bottomView.frame = viewModel.sizes.bottomViewFrame
         
@@ -224,6 +247,7 @@ final class NewsFeedCodeCell: UITableViewCell {
         
         cardView.addSubview(topView)
         cardView.addSubview(postLabel)
+        cardView.addSubview(moreTextButton)
         cardView.addSubview(postImageView)
         cardView.addSubview(bottomView)
         
