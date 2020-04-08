@@ -63,6 +63,9 @@ class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic, NewsFeedCo
     
     func revealText(cell: NewsFeedCodeCell) {
         print("Delegate")
+        guard let indexPath = tableView.indexPath(for: cell) else { return }
+        let cellViewModel = feedviewModel.cells[indexPath.row]
+        interactor?.makeRequest(request: .revealPostIds(postId: cellViewModel.postId))
     }
 }
 
@@ -80,6 +83,11 @@ extension NewsFeedViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        let cellVIewModel = feedviewModel.cells[indexPath.row]
+        return cellVIewModel.sizes.totalHeight
+    }
+    
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         let cellVIewModel = feedviewModel.cells[indexPath.row]
         return cellVIewModel.sizes.totalHeight
     }

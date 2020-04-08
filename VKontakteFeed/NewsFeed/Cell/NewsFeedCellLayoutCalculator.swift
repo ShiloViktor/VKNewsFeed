@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 protocol FeedCellLayoutCalculatorProtocol {
-    func sizes(photoAttachment: FeedCellPhotoViewModel?, postText: String?) -> FeedCellSizes
+    func sizes(photoAttachment: FeedCellPhotoViewModel?, postText: String?, isFullSizedPost: Bool) -> FeedCellSizes
 }
 
 struct Sizes: FeedCellSizes {
@@ -28,7 +28,7 @@ final class NewsFeedCellLayoutCalculator: FeedCellLayoutCalculatorProtocol {
         self.screenWidth = screenWidth
     }
     
-    func sizes(photoAttachment: FeedCellPhotoViewModel?, postText: String?) -> FeedCellSizes {
+    func sizes(photoAttachment: FeedCellPhotoViewModel?, postText: String?, isFullSizedPost: Bool) -> FeedCellSizes {
         
         var moreTextButtonIsShow = false
         
@@ -44,7 +44,7 @@ final class NewsFeedCellLayoutCalculator: FeedCellLayoutCalculatorProtocol {
             
             let limitHright = Constants.postLabelFont.lineHeight * Constants.minPostLimitLines
             
-            if height > limitHright {
+            if !isFullSizedPost && height > limitHright {
                 height = Constants.postLabelFont.lineHeight * Constants.minPostLines
                 moreTextButtonIsShow = true
             }

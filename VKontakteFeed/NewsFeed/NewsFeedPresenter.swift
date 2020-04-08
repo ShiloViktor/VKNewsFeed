@@ -27,10 +27,10 @@ class NewsFeedPresenter: NewsFeedPresentationLogic {
   
   func presentData(response: NewsFeed.Model.Response.ResponseType) {
     switch response {
-    case .presentNewsFeed(let response):
+    case .presentNewsFeed(let response, let postIds):
         
         let cells = response.items.map { (feedItem) in
-            convertFeedItemToFeedViewModel(feedItem: feedItem, profile: response.profiles , group: response.groups)
+            convertFeedItemToFeedViewModel(feedItem: feedItem, profile: response.profiles , group: response.groups, postIds: postIds)
         }
         
         let feedViewModel = FeedViewModel.init(cells: cells)
@@ -41,18 +41,23 @@ class NewsFeedPresenter: NewsFeedPresentationLogic {
     }
 }
 
-    private func convertFeedItemToFeedViewModel(feedItem: FeedItems, profile: [Profile], group: [Group]) -> FeedViewModel.Cell {
+    private func convertFeedItemToFeedViewModel(feedItem: FeedItems, profile: [Profile], group: [Group], postIds: [Int]) -> FeedViewModel.Cell {
         
         let date = Date(timeIntervalSince1970: feedItem.date)
         let dateTitle = dateFormatter.string(from: date)
+        
+        let isFullSized = postIds.contains { (postId) -> Bool in
+            return postId == feedItem.postId
+        }
         
         let profile = self.profile(sourceId: feedItem.sourceId, profiles: profile, groupes: group)
         
         let photo = self.photoAttachment(feedItem: feedItem)
         
-        let sizes = cellLayoutCalculator.sizes(photoAttachment: photo, postText: feedItem.text)
+        let sizes = cellLayoutCalculator.sizes(photoAttachment: photo, postText: feedItem.text, isFullSizedPost: isFullSized)
         
-        return FeedViewModel.Cell(iconUrlImageView: profile.photo,
+        return FeedViewModel.Cell(postId: feedItem.postId,
+                                  iconUrlImageView: profile.photo,
                                   name: profile.name ,
                                   date: dateTitle,
                                   text: feedItem.text,
